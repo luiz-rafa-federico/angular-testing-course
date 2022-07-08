@@ -1,0 +1,74 @@
+Jasmine
+
+pending();
+
+fail();
+
+when the service does not have any deps:
+declare an instance of the service (new... calls the constructor)
+CalculatorsService has a dep = LoggerService
+LoggerService has no deps
+const calculator = new CalculatorsService(new LoggerService)
+
+expect(result).toBe(2, 'message that is trigger after this test does not pass')
+
+Spies -> check when a function is called
+const logger = new LoggerService()
+spyOn(logger, 'log') -> object to be spied and function to be verified
+expect(logger.log).toHaveBeenCalledTimes(1)
+
+approach should be faking deps
+
+const logger = jasmine.createSpyObj<LoggerService>('LoggerService', ['log'])
+logger.log.and.returnValue() -> check what was returned from the log method
+
+when using an instance of the current object, we may use TestBed.inject(object)
+
+x disables the suite; f focus on the suite or the spec
+
+import HttpTestingModule and declare:
+    let httpTestingController: HttpTestingController; -> check requests
+    in beforeEach fn -> 
+        httpTestingController = TestBed.get(HttpTestingController) or 
+        TestBed.inject(HttpTestingController)
+
+*** to verify http requests, check the CoursesServices
+
+1) use an instance of the real service
+2) import HttpTestingModule
+3) declare HttpTestingController
+4) inject the deps -> TestBed.inject(HttpTestingController) and TestBed.inject(service)
+5) call the function and subscribe to it
+6) expects -> 
+
+    it("should retrieve all courses", () => {
+        coursesService.findAllCourses().subscribe((courses) => {
+        expect(courses).toBeTruthy("No courses returned");
+
+        expect(courses.length).toBe(12, "incorrect number of courses");
+
+        const course = courses.find((course) => course.id == 12);
+
+        expect(course.titles.description).toBe("Angular Testing Course");
+        });
+
+        const req = httpTestingController.expectOne("/api/courses");
+
+        expect(req.request.method).toEqual("GET");
+
+        req.flush({ payload: Object.values(COURSES) });
+
+        httpTestingController.verify() -> always called in the end of each http test, so
+            we could call in the afterEach() block.
+    });
+
+    
+7) req -> use the HttpTestingController to make the request and check its type
+8) req.flush -> brings the object from the backend (COURSES is the name of the object that contains all courses)
+    afterEach(() => {
+        httpTestingController.verify();
+    });
+9) verify function checks if any other request id being made by the service to the specified url or another url
+
+------
+

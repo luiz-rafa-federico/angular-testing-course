@@ -1,0 +1,54 @@
+configuration of the component testing suite
+    describe("CoursesCardListComponent", () => {
+  let component: CoursesCardListComponent;
+  let fixture: ComponentFixture<CoursesCardListComponent>;
+  let el: DebugElement;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [CoursesModule],
+    })
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(CoursesCardListComponent);
+        component = fixture.componentInstance;
+        el = fixture.debugElement;
+      });
+  }));
+    -> the compileComponents is asynchronous
+    -> if we dont use waitForAsync, the promise wont be resolved before the spec is run
+    -> we could use two blocks of beforeEach, one asynchronous and the other synchronous
+
+---
+    it("should display the course list", () => {
+        component.courses = setupCourses();
+
+        fixture.detectChanges();
+
+        const cards = el.queryAll(By.css(".course-card"));
+
+        expect(cards).toBeTruthy("Could not find cards");
+        expect(cards.length).toBe(12, "Unexpected number of courses");
+    });
+    -> we can pass an error message to the matcher
+    -> to debug the DOM: console.log(el.nativeElement.outerHTML) -> logs the component state
+
+---
+    it("should display the first course", () => {
+    component.courses = setupCourses();
+
+    fixture.detectChanges();
+
+    const course = component.courses[0];
+
+    const card = el.query(By.css(".course-card:first-child")),
+      title = card.query(By.css("mat-card-title")),
+      image = card.query(By.css("img"));
+
+    expect(card).toBeTruthy("Could not find course card");
+
+    expect(title.nativeElement.textContent).toBe(course.titles.description);
+
+    expect(image.nativeElement.src).toBe(course.iconUrl);
+  });
+  

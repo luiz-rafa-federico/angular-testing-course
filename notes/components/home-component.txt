@@ -1,0 +1,39 @@
+it("should display only beginner courses", () => {
+    coursesService.findAllCourses.and.returnValue(of(beginnerCourses));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mat-tab-label"));
+
+    expect(tabs.length).toBe(1, "Unexpected number of tabs found");
+  });
+  -> calls the method using an instance of the service, no the spy
+  -> ckecks the number of tabs displayed
+
+---
+  CHECK async-examples.spec.ts
+  -> for asynchronous functions, we call done (Jasmine function) as param, with setTimeOut,
+    but it is not the best approach. Should be avoided.
+  -> using done, the expect must be inside a code block; using fakeAsync it is not needed
+  -> flush() -> executed all asynchronous block in the test without having to use tick()
+  -> Promise is considered a micro task
+  -> setTimeOut, setInterval, AJAX requests, mouse clicks are  are a macro task (or task)
+  -> all asynchronous operations are added to the event loop
+    -> micro tasks like Promises will be resolved between the macro tasks are completed
+    -> micro tasks have their on separate queue in JS runtime, and so have macro tasks
+  -> flushMicroTasks() executes the micro tasks queue
+  -> fakeAsync to test Observables
+  -> async() is updated as waitForAsync()
+  -> some Observables are syncronous
+  -> in the async() test zone, we cannoy call flush() cause we do not have 
+    control over the tasks queue
+  -> async will run all asynchronous functions present in the zone,
+    and after that calls a callback that warns all the asynchronous
+    operations are complete
+      -> in order to have access to the callback, we use whenStable(),
+        which is a Promise. More convenient is to use fakeAsync()
+      -> async() test zone allows http requests to be tested (including fetching html and css files)
+        used mostly in the beforeEach (renamed as waitForAsync())
+      -> if we are not using components that are fetched from the backend, we can aldo use 
+        fakeAsync() in the beforeEach zone
+      
